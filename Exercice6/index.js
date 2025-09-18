@@ -1,7 +1,6 @@
-// index.js
-
 const display = document.getElementById('display');
 
+const debug= (...args) => document.getElementById('debug').textContent += '\n' + [...args].join(' / ')
 // Fonction pour ajouter un caractère (chiffre ou opérateur) dans l’écran
 function appendToDisplay(val) {
   display.value += val;
@@ -12,29 +11,31 @@ function clearDisplay() {
 }
 
 function calculateResult() {
-	// on prend ce qui est écrit dans l’écran et on enlève les espaces
-  const expr = display.value.trim();
-	// si c’est vide, on ne fait rien
-  if (!expr) return;
-
-  // Autoriser uniquement chiffres et opérateurs + - * /
-  if (!/^[0-9+\-*/\s]+$/.test(expr)) {
-    display.value = 'Erreur';
-    return;
-  }
-
-  try {
-		// calcule directement la chaîne comme du JS
-		const result = eval(expr)
-		// Si le résultat est bien un nombre valide, on l’affiche, sinon erreur
-    display.value = Number.isFinite(result) ? String(result) : 'Erreur';
-  } catch {
-    display.value = 'Erreur';
-  }
+	display.value = evaluate()
 }
 
-// On rend les fonctions accessibles globalement (car le HTML appelle appendToDisplay(), etc.)
-// 
-window.appendToDisplay = appendToDisplay;
-window.clearDisplay = clearDisplay;
-window.calculateResult = calculateResult;
+const evaluate = () => {
+	const expr = display.value;
+	let v = ["", ""]
+	let part = 0
+	let op = ""
+	for (let i = 0; i< expr.length; i++) {
+		const char = expr[i]
+		if (["0","1","2","3","4","5","6","7","8","9"].includes(char))
+				v[part] += char
+		else {
+			op += char
+			part = Math.min(part + 1, 1)
+		}
+	}
+	if (!v[0] || !v[1] || !op) return ""
+	const v0 = parseInt(v[0])
+	const v1 = parseInt(v[1])
+	switch(op) {
+		case "+": return v0 + v1
+		case "-": return v0 - v1
+		case "*": return v0 * v1
+		case "/": return v1 == 0 ? "Division by zero is not allowed" : v0 / v1
+	}
+	return "this line should never been reached"
+}

@@ -1,6 +1,8 @@
 // Créez votre fonction ici
 
 const calculate = (a, b, operateur) => {
+	  a = +a
+  	b = +b
     switch (operateur) {
         case '+':
             return a + b;
